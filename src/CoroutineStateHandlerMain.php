@@ -23,7 +23,7 @@ readonly class CoroutineStateHandlerMain implements StateMainSuspendHandlerInter
         }
     }
 
-    public function handle(StateMainSuspendService $stateService): void
+    public function getResume(StateMainSuspendService $stateService): mixed
     {
         /** @var Coroutine $coroutine */
         $coroutine = $this->coroutineCollection->where('actionId', $stateService->getActionId())->first();
@@ -49,10 +49,10 @@ readonly class CoroutineStateHandlerMain implements StateMainSuspendHandlerInter
             $driver = $this->driverProvider->get($coroutine->driver);
             $driver->process($handler, $value);
 
-            $stateService->resume($callback);
-        } else {
-            $stateService->resume(is_callable($value) ? $value() : $value);
+            return $callback;
         }
+
+        return is_callable($value) ? $value() : $value;
     }
 
     public function observed(): array
