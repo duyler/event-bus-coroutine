@@ -7,7 +7,7 @@ namespace Duyler\EventBusCoroutine;
 use Duyler\DependencyInjection\ContainerBuilder;
 use Duyler\DependencyInjection\ContainerInterface;
 use Duyler\EventBusCoroutine\Driver\PcntlDriver;
-use Duyler\EventBusCoroutine\DTO\CoroutineDriver;
+use Duyler\EventBusCoroutine\Dto\CoroutineDriver;
 use Duyler\EventBusCoroutine\Exception\CoroutineDriverNotRegisteredException;
 
 class CoroutineDriverProvider
