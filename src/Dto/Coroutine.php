@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Duyler\EventBusCoroutine\DTO;
+namespace Duyler\EventBusCoroutine\Dto;
 
 use Closure;
 

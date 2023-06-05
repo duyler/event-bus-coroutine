@@ -6,7 +6,7 @@ namespace Duyler\EventBusCoroutine;
 
 use Duyler\EventBus\Contract\State\StateMainSuspendHandlerInterface;
 use Duyler\EventBus\State\Service\StateMainSuspendService;
-use Duyler\EventBusCoroutine\DTO\Coroutine;
+use Duyler\EventBusCoroutine\Dto\Coroutine;
 
 readonly class CoroutineStateHandlerMain implements StateMainSuspendHandlerInterface
 {
