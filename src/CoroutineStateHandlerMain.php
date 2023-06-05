@@ -7,7 +7,6 @@ namespace Duyler\EventBusCoroutine;
 use Duyler\EventBus\Contract\State\StateMainSuspendHandlerInterface;
 use Duyler\EventBus\State\Service\StateMainSuspendService;
 use Duyler\EventBusCoroutine\DTO\Coroutine;
-use Duyler\EventBusCoroutine\Coroutine as CoroutineFacade;
 
 readonly class CoroutineStateHandlerMain implements StateMainSuspendHandlerInterface
 {
@@ -15,12 +14,6 @@ readonly class CoroutineStateHandlerMain implements StateMainSuspendHandlerInter
         private CoroutineCollection $coroutineCollection,
         private CoroutineDriverProvider $driverProvider,
     ) {
-        new CoroutineFacade($this->coroutineCollection);
-        $path = dirname('__DIR__') . '/../config/coroutines/http.php';
-
-        if (is_file($path)) {
-            include $path;
-        }
     }
 
     public function getResume(StateMainSuspendService $stateService): mixed
@@ -53,11 +46,6 @@ readonly class CoroutineStateHandlerMain implements StateMainSuspendHandlerInter
         }
 
         return is_callable($value) ? $value() : $value;
-    }
-
-    public function observed(): array
-    {
-        return [];
     }
 
     public function prepare(): void
