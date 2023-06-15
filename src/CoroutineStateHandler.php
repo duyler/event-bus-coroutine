@@ -7,8 +7,9 @@ namespace Duyler\EventBusCoroutine;
 use Duyler\EventBus\Contract\State\StateMainSuspendHandlerInterface;
 use Duyler\EventBus\State\Service\StateMainSuspendService;
 use Duyler\EventBusCoroutine\Dto\Coroutine;
+use RuntimeException;
 
-readonly class CoroutineStateHandlerMain implements StateMainSuspendHandlerInterface
+readonly class CoroutineStateHandler implements StateMainSuspendHandlerInterface
 {
     public function __construct(
         private CoroutineCollection $coroutineCollection,
@@ -25,14 +26,18 @@ readonly class CoroutineStateHandlerMain implements StateMainSuspendHandlerInter
 
         if ($coroutine AND empty($coroutine->handler) === false || is_callable($value)) {
 
-            if (is_callable($coroutine->handler)) {
+            if (is_callable($value)) {
+                $handler = $value;
+            } elseif (is_callable($coroutine->handler)) {
                 $handler = $coroutine->handler;
             } elseif (class_exists($coroutine->handler)) {
                 $stateService->container->bind($coroutine->classMap);
                 $stateService->container->setProviders($coroutine->providers);
                 $handler = $stateService->container->make($coroutine->handler);
             } else {
-                $handler = $value;
+                throw new RuntimeException(
+                    'Coroutine handler is not resolved for ' . $stateService->getActionId()
+                );
             }
 
             $callback = is_callable($coroutine->callback)
@@ -41,7 +46,6 @@ readonly class CoroutineStateHandlerMain implements StateMainSuspendHandlerInter
 
             $driver = $this->driverProvider->get($coroutine->driver);
             $driver->process($handler, $value);
-
             return $callback;
         }
 
