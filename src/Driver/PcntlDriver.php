@@ -8,7 +8,7 @@ use Duyler\EventBusCoroutine\CoroutineDriverInterface;
 
 class PcntlDriver implements CoroutineDriverInterface
 {
-    public function process(callable $coroutine, mixed $value): void
+    public function process(callable $coroutine, mixed $value): mixed
     {
         if (extension_loaded('pcntl')) {
             $pid = pcntl_fork();
@@ -17,5 +17,6 @@ class PcntlDriver implements CoroutineDriverInterface
                 exit();
             }
         }
+        return null;
     }
 }

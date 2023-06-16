@@ -40,13 +40,12 @@ readonly class CoroutineStateHandler implements StateMainSuspendHandlerInterface
                 );
             }
 
-            $callback = is_callable($coroutine->callback)
+            $result = $this->driverProvider->get($coroutine->driver)?->process($handler, $value);
+
+            return $result
+                ?? is_callable($coroutine->callback)
                 ? $coroutine->callback
                 : $stateService->container->make($coroutine->callback);
-
-            $driver = $this->driverProvider->get($coroutine->driver);
-            $driver->process($handler, $value);
-            return $callback;
         }
 
         return is_callable($value) ? $value() : $value;
