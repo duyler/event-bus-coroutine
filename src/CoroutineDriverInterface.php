@@ -6,5 +6,5 @@ namespace Duyler\EventBusCoroutine;
 
 interface CoroutineDriverInterface
 {
-    public function process(callable $coroutine, mixed $value): void;
+    public function process(callable $coroutine, mixed $value): mixed;
 }
