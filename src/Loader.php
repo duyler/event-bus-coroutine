@@ -6,7 +6,8 @@ namespace Duyler\EventBusCoroutine;
 
 use Duyler\Contract\PackageLoader\LoaderServiceInterface;
 use Duyler\Contract\PackageLoader\PackageLoaderInterface;
-use Duyler\Framework\Facade\Coroutine;
+use Duyler\EventBusCoroutine\Facade\Coroutine;
+use Duyler\EventBusCoroutine\Facade\CoroutineDriver;
 
 class Loader implements PackageLoaderInterface
 {
@@ -14,8 +15,10 @@ class Loader implements PackageLoaderInterface
     {
         $container = $loaderService->getContainer();
 
+        $driverProvider = $container->make(CoroutineDriverProvider::class);
         $collector = $container->make(Collector::class);
 
+        new CoroutineDriver($driverProvider);
         new Coroutine($collector);
 
         $stateHandler = $container->make(CoroutineStateHandler::class);

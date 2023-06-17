@@ -6,14 +6,17 @@ namespace Duyler\EventBusCoroutine;
 
 use Duyler\DependencyInjection\ContainerBuilder;
 use Duyler\DependencyInjection\ContainerInterface;
+use Duyler\EventBusCoroutine\Driver\ParallelDriver;
 use Duyler\EventBusCoroutine\Driver\PcntlDriver;
 use Duyler\EventBusCoroutine\Dto\CoroutineDriver;
 use Duyler\EventBusCoroutine\Exception\CoroutineDriverNotRegisteredException;
 
 class CoroutineDriverProvider
 {
-    private const DEFAULT_DRIVER_CLASS = PcntlDriver::class;
-    private const DEFAULT_DRIVER_ID = 'pcntl';
+    private const DRIVERS = [
+        'pcntl' => PcntlDriver::class,
+        'parallel' => ParallelDriver::class,
+    ];
 
     private ContainerInterface $container;
 
@@ -24,10 +27,12 @@ class CoroutineDriverProvider
     {
         $this->container = ContainerBuilder::build();
 
-        $this->register(new CoroutineDriver(
-            id: self::DEFAULT_DRIVER_ID,
-            class: self::DEFAULT_DRIVER_CLASS,
-        ));
+        foreach (self::DRIVERS as $id => $driver) {
+            $this->register(new CoroutineDriver(
+                id: $id,
+                class: $driver,
+            ));
+        }
     }
 
     public function get(string $id): CoroutineDriverInterface

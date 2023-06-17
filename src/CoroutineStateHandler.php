@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Duyler\EventBusCoroutine;
 
+use Duyler\DependencyInjection\ContainerInterface;
 use Duyler\EventBus\Contract\State\StateMainSuspendHandlerInterface;
 use Duyler\EventBus\State\Service\StateMainSuspendService;
 use Duyler\EventBusCoroutine\Dto\Coroutine;
@@ -24,31 +25,40 @@ readonly class CoroutineStateHandler implements StateMainSuspendHandlerInterface
 
         $value = $stateService->getValue();
 
-        if ($coroutine AND empty($coroutine->handler) === false || is_callable($value)) {
+        if ($coroutine || is_callable($value)) {
 
-            if (is_callable($value)) {
-                $handler = $value;
-            } elseif (is_callable($coroutine->handler)) {
-                $handler = $coroutine->handler;
-            } elseif (class_exists($coroutine->handler)) {
-                $stateService->container->bind($coroutine->classMap);
-                $stateService->container->setProviders($coroutine->providers);
-                $handler = $stateService->container->make($coroutine->handler);
-            } else {
-                throw new RuntimeException(
+            $handler = match (true) {
+                is_callable($value) => $value,
+                is_callable($coroutine->handler) => $coroutine->handler,
+                class_exists($coroutine->handler) => $this->prepareContainer($stateService->container, $coroutine)
+                    ->make($coroutine->handler),
+                default => throw new RuntimeException(
                     'Coroutine handler is not resolved for ' . $stateService->getActionId()
-                );
-            }
+                )
+            };
 
             $result = $this->driverProvider->get($coroutine->driver)?->process($handler, $value);
 
-            return $result
-                ?? is_callable($coroutine->callback)
-                ? $coroutine->callback
-                : $stateService->container->make($coroutine->callback);
+            return match (true) {
+                $result !== null => $result,
+                empty($coroutine->callback) => $coroutine->callback,
+                is_callable($coroutine->callback) => $coroutine->callback,
+                class_exists($coroutine->callback) => $this->prepareContainer($stateService->container, $coroutine)
+                    ->make($coroutine->callback),
+                default => throw new RuntimeException(
+                    'Coroutine callback is not resolved for ' . $stateService->getActionId()
+                )
+            };
         }
 
         return is_callable($value) ? $value() : $value;
+    }
+
+    private function prepareContainer(ContainerInterface $container, Coroutine $coroutine): ContainerInterface
+    {
+        $container->bind($coroutine->classMap);
+        $container->setProviders($coroutine->providers);
+        return $container;
     }
 
     public function prepare(): void
