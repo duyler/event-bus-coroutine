@@ -9,7 +9,7 @@ use Duyler\EventBusCoroutine\Exception\CoroutineDriverNotAvailableException;
 
 class PcntlDriver implements CoroutineDriverInterface
 {
-    public function process(callable $coroutine, mixed $value): mixed
+    public function process(callable $callback, mixed $value): mixed
     {
         if (extension_loaded('pcntl') === false) {
             throw new CoroutineDriverNotAvailableException('pcntl');
@@ -17,7 +17,7 @@ class PcntlDriver implements CoroutineDriverInterface
 
         $pid = pcntl_fork();
         if ($pid === 0) {
-            $coroutine($value);
+            $callback($value);
             exit();
         }
 

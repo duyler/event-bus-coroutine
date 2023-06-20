@@ -6,6 +6,7 @@ namespace Duyler\EventBusCoroutine;
 
 use Duyler\DependencyInjection\ContainerBuilder;
 use Duyler\DependencyInjection\ContainerInterface;
+use Duyler\EventBusCoroutine\Driver\FiberDriver;
 use Duyler\EventBusCoroutine\Driver\ParallelDriver;
 use Duyler\EventBusCoroutine\Driver\PcntlDriver;
 use Duyler\EventBusCoroutine\Dto\CoroutineDriver;
@@ -16,6 +17,7 @@ class CoroutineDriverProvider
     private const DRIVERS = [
         'pcntl' => PcntlDriver::class,
         'parallel' => ParallelDriver::class,
+        'fiber' => FiberDriver::class,
     ];
 
     private ContainerInterface $container;

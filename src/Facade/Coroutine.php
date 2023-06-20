@@ -18,9 +18,9 @@ final class Coroutine
 
     public static function add(
         string           $actionId,
-        string           $driver,
-        string | Closure $handler = '',
+        string           $driver = '',
         string | Closure $callback = '',
+        string | Closure $promise = '',
         array            $classMap = [],
         array            $providers = [],
     ): void {
@@ -28,8 +28,8 @@ final class Coroutine
             new \Duyler\EventBusCoroutine\Dto\Coroutine(
                 actionId: $actionId,
                 driver: $driver,
+                promise: $promise,
                 callback: $callback,
-                handler: $handler,
                 classMap: $classMap,
                 providers: $providers,
             )

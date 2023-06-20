@@ -21,6 +21,15 @@ class Loader implements PackageLoaderInterface
         new CoroutineDriver($driverProvider);
         new Coroutine($collector);
 
+        /** @var \Duyler\Config\Config $config */
+        $config = $container->get(\Duyler\Config\Config::class);
+
+        $container->set(
+            new Config(
+                defaultDriver: $config->get('coroutine', 'default_driver', 'fiber')
+            )
+        );
+
         $stateHandler = $container->make(CoroutineStateHandler::class);
         $loaderService->getBuilder()->addStateHandler($stateHandler);
     }

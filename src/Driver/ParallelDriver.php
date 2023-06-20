@@ -6,17 +6,29 @@ namespace Duyler\EventBusCoroutine\Driver;
 
 use Duyler\EventBusCoroutine\CoroutineDriverInterface;
 use Duyler\EventBusCoroutine\Exception\CoroutineDriverNotAvailableException;
+use Fiber;
 use parallel\Runtime;
 
 class ParallelDriver implements CoroutineDriverInterface
 {
-    public function process(callable $coroutine, mixed $value): mixed
+    public function process(callable $callback, mixed $value): mixed
     {
         if (extension_loaded('parallel') === false) {
             throw new CoroutineDriverNotAvailableException('parallel');
         }
 
         $runtime = new Runtime();
-        return $runtime->run($coroutine, [$value]);
+        $future = $runtime->run($callback, [$value]);
+
+        return function () use ($future, $runtime) {
+            while ($future->done() === false) {
+                Fiber::suspend();
+            }
+
+            $future->cancel();
+            $runtime->kill();
+
+            return $future->value();
+        };
     }
 }
