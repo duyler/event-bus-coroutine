@@ -18,7 +18,6 @@ class PcntlDriver implements CoroutineDriverInterface
         $pid = pcntl_fork();
         if ($pid === 0) {
             $callback($value);
-            exit();
         }
 
         return null;
