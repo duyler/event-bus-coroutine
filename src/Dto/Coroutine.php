@@ -6,15 +6,15 @@ namespace Duyler\EventBusCoroutine\Dto;
 
 use Closure;
 
-readonly class Coroutine
+final readonly class Coroutine
 {
     public function __construct(
-        public string           $actionId,
-        public string | Closure $callback,
-        public string | Closure $handler = '',
+        public string           $actionId = '',
+        public string           $driver = '',
+        public string | Closure $promise = '',
+        public string | Closure $callback = '',
         public array            $classMap = [],
         public array            $providers = [],
-        public string           $driver = 'pcntl',
     ) {
     }
 }
